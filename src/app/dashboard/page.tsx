@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { PlusCircle, TrendingUp, Users, ScanLine, Star } from "lucide-react";
 
@@ -26,11 +26,9 @@ export default async function DashboardPage() {
           <p className="text-zinc-500 max-w-sm mx-auto">
             Add your business details to generate your first QR code and start collecting AI-powered reviews.
           </p>
-          <Button asChild className="mt-4">
-            <Link href="/dashboard/business/new">
-              Add Business
-            </Link>
-          </Button>
+          <Link href="/dashboard/business/new" className={buttonVariants({ className: "mt-4" })}>
+            Add Business
+          </Link>
         </div>
       </div>
     );

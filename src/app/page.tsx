@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { QrCode, Star, TrendingUp, ShieldCheck, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -17,9 +17,9 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium hover:text-zinc-600 transition-colors">Login</Link>
-            <Button asChild size="sm" className="rounded-full px-6">
-              <Link href="/register">Get Started</Link>
-            </Button>
+            <Link href="/register" className={buttonVariants({ size: "sm", className: "rounded-full px-6" })}>
+              Get Started
+            </Link>
           </div>
         </div>
       </nav>
@@ -61,11 +61,9 @@ export default function LandingPage() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
           >
-            <Button asChild size="lg" className="rounded-full px-8 text-base h-14 group">
-              <Link href="/register">
-                Start for free <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
+            <Link href="/register" className={buttonVariants({ size: "lg", className: "rounded-full px-8 text-base h-14 group" })}>
+              Start for free <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
             <Button variant="outline" size="lg" className="rounded-full px-8 text-base h-14">
               View Demo
             </Button>
