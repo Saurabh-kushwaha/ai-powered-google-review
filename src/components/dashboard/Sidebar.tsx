@@ -14,13 +14,13 @@ const navItems = [
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ className, onClose }: { className?: string, onClose?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <div className="w-64 border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col">
+    <div className={cn("w-64 border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col h-full", className)}>
       <div className="p-6">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2" onClick={onClose}>
           <div className="w-8 h-8 bg-zinc-900 dark:bg-white rounded-md flex items-center justify-center">
             <QrCode className="w-5 h-5 text-white dark:text-zinc-900" />
           </div>
@@ -35,6 +35,7 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={onClose}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                 isActive

@@ -22,8 +22,10 @@ export default function NewBusinessPage() {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleCategoryChange = (val: string) => {
-    setFormData((prev) => ({ ...prev, category: val }));
+  const handleCategoryChange = (val: string | null) => {
+    if (val) {
+      setFormData((prev) => ({ ...prev, category: val }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

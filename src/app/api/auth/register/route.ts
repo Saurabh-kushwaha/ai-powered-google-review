@@ -1,5 +1,4 @@
-import { NextResponse } from "next-auth/next"; // wait, usually we use next/server
-// let me fix it to next/server
+// removed erroneous import
 import { NextResponse as Response } from "next/server";
 import bcrypt from "bcrypt";
 import prisma from "@/lib/prisma";
