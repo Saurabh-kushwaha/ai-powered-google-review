@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  email          String?    @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?  
+  role           String     @default("OWNER") // OWNER, ADMIN
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  businesses     Business[]
+}
+
+model Business {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  category        String?
+  logoUrl         String?
+  googleReviewUrl String?
+  shortLinkId     String   @unique // e.g., random 6-char string for /r/XYZ123
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  scanEvents      ScanEvent[]
+  feedbacks       Feedback[]
+}
+
+model ScanEvent {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  businessId String   @db.ObjectId
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  userAgent  String?
+  deviceType String?  // MOBILE, DESKTOP
+  createdAt  DateTime @default(now())
+}
+
+model Feedback {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  businessId     String   @db.ObjectId
+  business       Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  // Ratings
+  foodRating     Int?
+  serviceRating  Int?
+  ambienceRating Int?
+  overallRating  Int
+  
+  // AI Generated Content (if rating was good)
+  aiGeneratedReview String?
+  toneUsed          String?
+  
+  // Private Feedback (if rating was bad)
+  privateFeedback   String?
+  
+  // Status
+  isRedirectedToGoogle Boolean @default(false)
+  sentiment            String? // POSITIVE, NEGATIVE, NEUTRAL
+  
+  createdAt      DateTime @default(now())
+}
