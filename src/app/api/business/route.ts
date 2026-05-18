@@ -56,3 +56,38 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Internal Error" }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { name, category, googleReviewUrl } = body;
+
+    // We get the first business of the user since currently it's 1 business per user
+    const existingBusiness = await prisma.business.findFirst({
+      where: { userId: session.user.id },
+    });
+
+    if (!existingBusiness) {
+      return NextResponse.json({ error: "Business not found" }, { status: 404 });
+    }
+
+    const updatedBusiness = await prisma.business.update({
+      where: { id: existingBusiness.id },
+      data: {
+        name: name || existingBusiness.name,
+        category: category || existingBusiness.category,
+        googleReviewUrl: googleReviewUrl || existingBusiness.googleReviewUrl,
+      },
+    });
+
+    return NextResponse.json({ message: "Business updated", business: updatedBusiness });
+  } catch (error: any) {
+    console.error("BUSINESS_UPDATE_ERROR", error);
+    return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+  }
+}
