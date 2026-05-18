@@ -31,13 +31,13 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ message: "Business created", business }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("BUSINESS_CREATE_ERROR", error);
     return NextResponse.json({ error: "Internal Error" }, { status: 500 });
   }
 }
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json(businesses);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("BUSINESS_GET_ERROR", error);
     return NextResponse.json({ error: "Internal Error" }, { status: 500 });
   }
@@ -86,7 +86,7 @@ export async function PATCH(request: Request) {
     });
 
     return NextResponse.json({ message: "Business updated", business: updatedBusiness });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("BUSINESS_UPDATE_ERROR", error);
     return NextResponse.json({ error: "Internal Error" }, { status: 500 });
   }

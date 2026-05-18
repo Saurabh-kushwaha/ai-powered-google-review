@@ -61,7 +61,7 @@ export default function BusinessSettingsForm({ business }: BusinessSettingsFormP
       });
 
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error("Error", {
         description: "Something went wrong. Please try again.",
       });

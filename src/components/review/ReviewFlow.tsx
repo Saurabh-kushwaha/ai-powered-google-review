@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { useState } from "react";
 import { Business } from "@prisma/client";
@@ -49,7 +50,7 @@ export default function ReviewFlow({ business }: { business: Business }) {
         toast.error("Failed to generate review.");
         setStep("DETAILED");
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred.");
       setStep("DETAILED");
     }
@@ -64,7 +65,7 @@ export default function ReviewFlow({ business }: { business: Business }) {
         body: JSON.stringify({ businessId: business.id, overall, privateFeedback })
       });
       setStep("THANKS");
-    } catch (error) {
+    } catch {
       toast.error("An error occurred.");
     } finally {
       setIsSubmitting(false);
@@ -87,7 +88,7 @@ export default function ReviewFlow({ business }: { business: Business }) {
       if (business.googleReviewUrl) {
         window.location.href = business.googleReviewUrl;
       }
-    } catch (err) {
+    } catch {
       toast.error("Failed to copy text.");
     }
   };
@@ -99,7 +100,7 @@ export default function ReviewFlow({ business }: { business: Business }) {
           <Card className="text-center">
             <CardHeader>
               <div className="mx-auto w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mb-4 text-2xl">
-                {business.logoUrl ? <img src={business.logoUrl} alt="Logo" className="w-full h-full rounded-full object-cover" /> : "🍽️"}
+                {business.logoUrl ? <Image src={business.logoUrl} alt="Logo" width={64} height={64} className="w-full h-full rounded-full object-cover" /> : "🍽️"}
               </div>
               <CardTitle className="text-2xl">Rate your experience</CardTitle>
               <CardDescription>How was your visit to {business.name}?</CardDescription>
@@ -123,7 +124,7 @@ export default function ReviewFlow({ business }: { business: Business }) {
         <motion.div key="private" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
           <Card>
             <CardHeader>
-              <CardTitle>We're sorry to hear that</CardTitle>
+              <CardTitle>We&apos;re sorry to hear that</CardTitle>
               <CardDescription>Please let us know how we can improve.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -228,7 +229,7 @@ export default function ReviewFlow({ business }: { business: Business }) {
             </CardHeader>
             <CardContent>
               <div className="p-4 bg-zinc-100 dark:bg-zinc-900 rounded-md text-sm italic">
-                "{generatedReview}"
+                &quot;{generatedReview}&quot;
               </div>
             </CardContent>
             <CardFooter className="flex-col gap-3">

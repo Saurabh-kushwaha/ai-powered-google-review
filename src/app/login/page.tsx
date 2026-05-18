@@ -40,7 +40,7 @@ export default function LoginPage() {
         router.push("/dashboard");
         router.refresh();
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);

@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ reviewText });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("GENERATE_REVIEW_ERROR", error);
     return NextResponse.json({ error: "Internal Error" }, { status: 500 });
   }

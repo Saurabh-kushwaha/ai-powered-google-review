@@ -42,7 +42,7 @@ export default function RegisterPage() {
         const data = await res.json();
         toast.error(data.error || "Failed to create account");
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);

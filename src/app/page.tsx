@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { QrCode, Star, TrendingUp, ShieldCheck, ArrowRight, CheckCircle, Zap, Globe, MessageSquare, BarChart3, Lock } from "lucide-react";
+import { QrCode, Star, ShieldCheck, ArrowRight, CheckCircle, Zap, Globe, MessageSquare, BarChart3, Lock } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
@@ -134,7 +134,7 @@ export default function LandingPage() {
           {/* Double the content for seamless infinite scroll */}
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex space-x-16 items-center">
-              <div className="text-2xl font-bold flex items-center gap-3"><Globe className="w-7 h-7"/> Joe's Cafe</div>
+              <div className="text-2xl font-bold flex items-center gap-3"><Globe className="w-7 h-7"/> Joe&apos;s Cafe</div>
               <div className="text-2xl font-bold flex items-center gap-3"><Zap className="w-7 h-7"/> Elite Fitness</div>
               <div className="text-2xl font-bold flex items-center gap-3"><Star className="w-7 h-7"/> The Grand Hotel</div>
               <div className="text-2xl font-bold flex items-center gap-3"><ShieldCheck className="w-7 h-7"/> Metro Clinic</div>
@@ -390,7 +390,7 @@ function TypewriterText({ text }: { text: string }) {
       }}
       className="text-sm font-medium italic text-zinc-700 dark:text-zinc-300 min-h-[80px]"
     >
-      "{displayedText}{displayedText.length < text.length && started ? <span className="animate-pulse">|</span> : ""}"
+      &quot;{displayedText}{displayedText.length < text.length && started ? <span className="animate-pulse">|</span> : ""}&quot;
     </motion.div>
   );
 }
