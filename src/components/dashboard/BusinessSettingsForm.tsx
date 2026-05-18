@@ -12,8 +12,8 @@ interface BusinessSettingsFormProps {
   business: {
     id: string;
     name: string;
-    category: string;
-    googleReviewUrl: string;
+    category: string | null;
+    googleReviewUrl: string | null;
     shortLinkId: string;
   };
 }
@@ -23,9 +23,9 @@ export default function BusinessSettingsForm({ business }: BusinessSettingsFormP
 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: business.name,
-    category: business.category,
-    googleReviewUrl: business.googleReviewUrl,
+    name: business.name || "",
+    category: business.category || "",
+    googleReviewUrl: business.googleReviewUrl || "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
