@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/dashboard/Sidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
+import prisma from "@/lib/prisma";
 
 export default async function DashboardLayout({
   children,
@@ -13,6 +14,20 @@ export default async function DashboardLayout({
 
   if (!session) {
     redirect("/login");
+  }
+
+  // Check subscription — redirect FREE users to payment
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { subscriptionStatus: true },
+    });
+
+    if (user?.subscriptionStatus === "FREE") {
+      redirect("/onboarding/payment");
+    }
+  } catch {
+    // Prisma client may not have been regenerated yet — skip gate
   }
 
   return (

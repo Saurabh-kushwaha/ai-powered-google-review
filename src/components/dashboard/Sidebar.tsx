@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { QrCode, LayoutDashboard, Settings, LogOut, Store } from "lucide-react";
+import { QrCode, LayoutDashboard, Settings, LogOut, Store, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "QR Generator", href: "/dashboard/qr", icon: QrCode },
   { name: "My Business", href: "/dashboard/business", icon: Store },
+  { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
