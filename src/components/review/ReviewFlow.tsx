@@ -12,10 +12,191 @@ import { toast } from "sonner";
 
 type Step = "OVERALL" | "DETAILED" | "GENERATING" | "RESULT" | "PRIVATE_FEEDBACK" | "THANKS";
 
+const CATEGORY_ICONS: Record<string, string> = {
+  // Values from new-business form (lowercase)
+  restaurant: "🍽️",
+  hotel: "🏨",
+  salon: "💇",
+  clinic: "🏥",
+  retail: "🛍️",
+  // Values from settings form (saved as uppercase, lowercased by getCategoryIcon)
+  service: "🤝",
+  healthcare: "🏥",
+  beauty: "💅",
+  other: "🏪",
+  // Extra aliases
+  cafe: "☕",
+  bakery: "🥐",
+  bar: "🍸",
+  spa: "💆",
+  gym: "🏋️",
+  hospital: "🏥",
+  pharmacy: "💊",
+  dentist: "🦷",
+  school: "🏫",
+  bank: "🏦",
+  grocery: "🛒",
+  supermarket: "🛒",
+  automotive: "🚗",
+  garage: "🔧",
+  laundry: "👕",
+  pet: "🐾",
+  travel: "✈️",
+  tech: "💻",
+};
+
+function getCategoryIcon(category?: string | null): string {
+  if (!category) return "🏪";
+  const key = category.toLowerCase().trim();
+  // Exact match first
+  if (CATEGORY_ICONS[key]) return CATEGORY_ICONS[key];
+  // Partial match (handles things like "fast food restaurant")
+  for (const [k, icon] of Object.entries(CATEGORY_ICONS)) {
+    if (key.includes(k) || k.includes(key)) return icon;
+  }
+  return "🏪";
+}
+
+/** Category-specific rating dimensions shown in the DETAILED step */
+const CATEGORY_QUESTIONS: Record<string, { key: string; label: string; emoji: string }[]> = {
+  restaurant: [
+    { key: "food",        label: "Food Quality",    emoji: "🍽️" },
+    { key: "service",     label: "Service Speed",   emoji: "⚡" },
+    { key: "ambience",    label: "Ambience",         emoji: "✨" },
+    { key: "cleanliness", label: "Cleanliness",      emoji: "🧹" },
+  ],
+  hotel: [
+    { key: "rooms",       label: "Room Comfort",    emoji: "🛏️" },
+    { key: "cleanliness", label: "Cleanliness",      emoji: "🧹" },
+    { key: "service",     label: "Staff Service",   emoji: "🤝" },
+    { key: "value",       label: "Value for Money", emoji: "💰" },
+  ],
+  retail: [
+    { key: "products",    label: "Product Range",   emoji: "📦" },
+    { key: "staff",       label: "Staff Helpfulness",emoji: "🤝" },
+    { key: "cleanliness", label: "Store Cleanliness",emoji: "🧹" },
+    { key: "value",       label: "Value for Money", emoji: "💰" },
+  ],
+  beauty: [
+    { key: "skill",       label: "Skill & Expertise",emoji: "✂️" },
+    { key: "service",     label: "Staff Friendliness",emoji: "😊" },
+    { key: "cleanliness", label: "Cleanliness",      emoji: "🧹" },
+    { key: "value",       label: "Value for Money", emoji: "💰" },
+  ],
+  healthcare: [
+    { key: "care",        label: "Quality of Care", emoji: "❤️" },
+    { key: "staff",       label: "Staff Attitude",  emoji: "😊" },
+    { key: "wait",        label: "Wait Time",        emoji: "⏳" },
+    { key: "cleanliness", label: "Cleanliness",      emoji: "🧹" },
+  ],
+  service: [
+    { key: "quality",     label: "Work Quality",    emoji: "⭐" },
+    { key: "communication",label: "Communication",  emoji: "💬" },
+    { key: "timeliness",  label: "Timeliness",       emoji: "⏱️" },
+    { key: "value",       label: "Value for Money", emoji: "💰" },
+  ],
+  // ── New categories ──────────────────────────────────────────────────────────
+  cafe: [
+    { key: "drinks",      label: "Drinks Quality",  emoji: "☕" },
+    { key: "food",        label: "Food Quality",    emoji: "🥐" },
+    { key: "ambience",    label: "Ambience",         emoji: "✨" },
+    { key: "value",       label: "Value for Money", emoji: "💰" },
+  ],
+  bakery: [
+    { key: "food",        label: "Baked Goods Quality", emoji: "🥐" },
+    { key: "freshness",   label: "Freshness",        emoji: "🌟" },
+    { key: "service",     label: "Staff Friendliness",emoji: "😊" },
+    { key: "value",       label: "Value for Money", emoji: "💰" },
+  ],
+  bar: [
+    { key: "drinks",      label: "Drinks Quality",  emoji: "🍸" },
+    { key: "service",     label: "Bartender Service",emoji: "⚡" },
+    { key: "ambience",    label: "Atmosphere",       emoji: "✨" },
+    { key: "value",       label: "Value for Money", emoji: "💰" },
+  ],
+  grocery: [
+    { key: "products",    label: "Product Variety", emoji: "🛒" },
+    { key: "freshness",   label: "Freshness",        emoji: "🌿" },
+    { key: "cleanliness", label: "Store Cleanliness",emoji: "🧹" },
+    { key: "value",       label: "Value for Money", emoji: "💰" },
+  ],
+  gym: [
+    { key: "equipment",   label: "Equipment Quality",emoji: "🏋️" },
+    { key: "cleanliness", label: "Cleanliness",      emoji: "🧹" },
+    { key: "staff",       label: "Staff & Trainers", emoji: "💪" },
+    { key: "value",       label: "Value for Money", emoji: "💰" },
+  ],
+  pharmacy: [
+    { key: "stock",       label: "Stock Availability",emoji: "💊" },
+    { key: "staff",       label: "Staff Knowledge",  emoji: "😊" },
+    { key: "wait",        label: "Wait Time",         emoji: "⏳" },
+    { key: "value",       label: "Value for Money",  emoji: "💰" },
+  ],
+  dentist: [
+    { key: "care",        label: "Quality of Care",  emoji: "🦷" },
+    { key: "staff",       label: "Staff Attitude",   emoji: "😊" },
+    { key: "wait",        label: "Wait Time",         emoji: "⏳" },
+    { key: "cleanliness", label: "Cleanliness",       emoji: "🧹" },
+  ],
+  automotive: [
+    { key: "quality",     label: "Work Quality",     emoji: "🔧" },
+    { key: "timeliness",  label: "Timeliness",        emoji: "⏱️" },
+    { key: "communication",label: "Communication",   emoji: "💬" },
+    { key: "value",       label: "Value for Money",  emoji: "💰" },
+  ],
+  pet: [
+    { key: "care",        label: "Pet Care Quality", emoji: "🐾" },
+    { key: "staff",       label: "Staff Friendliness",emoji: "😊" },
+    { key: "cleanliness", label: "Cleanliness",       emoji: "🧹" },
+    { key: "value",       label: "Value for Money",  emoji: "💰" },
+  ],
+  tech: [
+    { key: "products",    label: "Product Range",    emoji: "💻" },
+    { key: "staff",       label: "Staff Knowledge",  emoji: "🤝" },
+    { key: "service",     label: "After-Sales Service",emoji: "⭐" },
+    { key: "value",       label: "Value for Money",  emoji: "💰" },
+  ],
+  travel: [
+    { key: "service",     label: "Service Quality",  emoji: "✈️" },
+    { key: "communication",label: "Communication",   emoji: "💬" },
+    { key: "value",       label: "Value for Money",  emoji: "💰" },
+    { key: "experience",  label: "Overall Experience",emoji: "🌍" },
+  ],
+  school: [
+    { key: "teaching",    label: "Teaching Quality", emoji: "📚" },
+    { key: "staff",       label: "Staff Attitude",   emoji: "😊" },
+    { key: "facilities",  label: "Facilities",        emoji: "🏫" },
+    { key: "value",       label: "Value for Money",  emoji: "💰" },
+  ],
+  bank: [
+    { key: "service",     label: "Customer Service", emoji: "🤝" },
+    { key: "wait",        label: "Wait Time",         emoji: "⏳" },
+    { key: "digital",     label: "Digital Services", emoji: "📱" },
+    { key: "trust",       label: "Trustworthiness",  emoji: "🔒" },
+  ],
+};
+
+const DEFAULT_QUESTIONS = [
+  { key: "quality",     label: "Overall Quality",  emoji: "⭐" },
+  { key: "service",     label: "Customer Service", emoji: "🤝" },
+  { key: "cleanliness", label: "Cleanliness",      emoji: "🧹" },
+  { key: "value",       label: "Value for Money", emoji: "💰" },
+];
+
+function getQuestions(category?: string | null) {
+  if (!category) return DEFAULT_QUESTIONS;
+  const key = category.toLowerCase().trim();
+  if (CATEGORY_QUESTIONS[key]) return CATEGORY_QUESTIONS[key];
+  for (const [k, qs] of Object.entries(CATEGORY_QUESTIONS)) {
+    if (key.includes(k) || k.includes(key)) return qs;
+  }
+  return DEFAULT_QUESTIONS;
+}
+
 export default function ReviewFlow({ business }: { business: Business }) {
   const [step, setStep] = useState<Step>("OVERALL");
   const [overall, setOverall] = useState(0);
-  const [details, setDetails] = useState({ food: 0, service: 0, ambience: 0, cleanliness: 0 });
+  const [details, setDetails] = useState<Record<string, number>>({});
   const [tone, setTone] = useState("friendly");
   const [privateFeedback, setPrivateFeedback] = useState("");
   const [generatedReview, setGeneratedReview] = useState("");
@@ -30,7 +211,7 @@ export default function ReviewFlow({ business }: { business: Business }) {
     }
   };
 
-  const handleDetailSelect = (category: keyof typeof details, rating: number) => {
+  const handleDetailSelect = (category: string, rating: number) => {
     setDetails(prev => ({ ...prev, [category]: rating }));
   };
 
@@ -100,7 +281,13 @@ export default function ReviewFlow({ business }: { business: Business }) {
           <Card className="text-center">
             <CardHeader>
               <div className="mx-auto w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mb-4 text-2xl">
-                {business.logoUrl ? <Image src={business.logoUrl} alt="Logo" width={64} height={64} className="w-full h-full rounded-full object-cover" /> : "🍽️"}
+                {business.logoUrl ? (
+                  <Image src={business.logoUrl} alt="Logo" width={64} height={64} className="w-full h-full rounded-full object-cover" />
+                ) : (
+                  <span className="text-3xl" role="img" aria-label={business.category ?? "business"}>
+                    {getCategoryIcon(business.category)}
+                  </span>
+                )}
               </div>
               <CardTitle className="text-2xl">Rate your experience</CardTitle>
               <CardDescription>How was your visit to {business.name}?</CardDescription>
@@ -164,18 +351,16 @@ export default function ReviewFlow({ business }: { business: Business }) {
               <CardDescription>Help us craft the perfect review for you.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {[
-                { key: "food", label: "Food Quality" },
-                { key: "service", label: "Service Speed" },
-                { key: "ambience", label: "Ambience" },
-                { key: "cleanliness", label: "Cleanliness" },
-              ].map((cat) => (
-                <div key={cat.key} className="flex items-center justify-between">
-                  <span className="font-medium text-sm">{cat.label}</span>
-                  <div className="flex gap-1">
+              {getQuestions(business.category).map((cat) => (
+                <div key={cat.key} className="flex items-center justify-between gap-4">
+                  <span className="font-medium text-sm flex items-center gap-2">
+                    <span className="text-lg">{cat.emoji}</span>
+                    {cat.label}
+                  </span>
+                  <div className="flex gap-1 shrink-0">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <button key={star} onClick={() => handleDetailSelect(cat.key as keyof typeof details, star)}>
-                        <Star className={`w-6 h-6 ${details[cat.key as keyof typeof details] >= star ? "fill-yellow-400 text-yellow-400" : "text-zinc-200 dark:text-zinc-800"}`} />
+                      <button key={star} onClick={() => handleDetailSelect(cat.key, star)}>
+                        <Star className={`w-6 h-6 ${(details[cat.key] ?? 0) >= star ? "fill-yellow-400 text-yellow-400" : "text-zinc-200 dark:text-zinc-800"}`} />
                       </button>
                     ))}
                   </div>

@@ -85,13 +85,27 @@ export default function NewBusinessPage() {
                 <SelectTrigger>
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="restaurant">Restaurant / Cafe</SelectItem>
-                  <SelectItem value="hotel">Hotel / Accommodation</SelectItem>
-                  <SelectItem value="salon">Salon / Spa</SelectItem>
-                  <SelectItem value="clinic">Clinic / Healthcare</SelectItem>
-                  <SelectItem value="retail">Retail Store</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                <SelectContent className="w-full">
+                  <SelectItem value="RESTAURANT">🍽️ Restaurant / Cafe</SelectItem>
+                  <SelectItem value="CAFE">☕ Cafe / Coffee Shop</SelectItem>
+                  <SelectItem value="BAKERY">🥐 Bakery</SelectItem>
+                  <SelectItem value="BAR">🍸 Bar / Pub</SelectItem>
+                  <SelectItem value="HOTEL">🏨 Hotel / Accommodation</SelectItem>
+                  <SelectItem value="RETAIL">🛍️ Retail Store</SelectItem>
+                  <SelectItem value="GROCERY">🛒 Grocery / Supermarket</SelectItem>
+                  <SelectItem value="BEAUTY">💅 Beauty / Salon / Spa</SelectItem>
+                  <SelectItem value="GYM">🏋️ Gym / Fitness</SelectItem>
+                  <SelectItem value="HEALTHCARE">🏥 Healthcare / Clinic</SelectItem>
+                  <SelectItem value="PHARMACY">💊 Pharmacy</SelectItem>
+                  <SelectItem value="DENTIST">🦷 Dentist</SelectItem>
+                  <SelectItem value="SERVICE">🤝 Professional Service</SelectItem>
+                  <SelectItem value="AUTOMOTIVE">🚗 Automotive / Garage</SelectItem>
+                  <SelectItem value="PET">🐾 Pet Store / Vet</SelectItem>
+                  <SelectItem value="TECH">💻 Tech / Electronics</SelectItem>
+                  <SelectItem value="TRAVEL">✈️ Travel / Agency</SelectItem>
+                  <SelectItem value="SCHOOL">🏫 Education / School</SelectItem>
+                  <SelectItem value="BANK">🏦 Bank / Finance</SelectItem>
+                  <SelectItem value="OTHER">🏪 Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>

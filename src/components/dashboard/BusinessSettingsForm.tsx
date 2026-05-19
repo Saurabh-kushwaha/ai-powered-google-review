@@ -100,13 +100,27 @@ export default function BusinessSettingsForm({ business }: BusinessSettingsFormP
             <SelectTrigger className="bg-zinc-50 dark:bg-zinc-900/50">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="RESTAURANT">Restaurant / Cafe</SelectItem>
-              <SelectItem value="RETAIL">Retail Store</SelectItem>
-              <SelectItem value="SERVICE">Professional Service</SelectItem>
-              <SelectItem value="HEALTHCARE">Healthcare / Clinic</SelectItem>
-              <SelectItem value="BEAUTY">Beauty / Salon</SelectItem>
-              <SelectItem value="OTHER">Other</SelectItem>
+            <SelectContent className="w-full">
+              <SelectItem value="RESTAURANT">🍽️ Restaurant / Cafe</SelectItem>
+              <SelectItem value="CAFE">☕ Cafe / Coffee Shop</SelectItem>
+              <SelectItem value="BAKERY">🥐 Bakery</SelectItem>
+              <SelectItem value="BAR">🍸 Bar / Pub</SelectItem>
+              <SelectItem value="HOTEL">🏨 Hotel / Accommodation</SelectItem>
+              <SelectItem value="RETAIL">🛍️ Retail Store</SelectItem>
+              <SelectItem value="GROCERY">🛒 Grocery / Supermarket</SelectItem>
+              <SelectItem value="BEAUTY">💅 Beauty / Salon / Spa</SelectItem>
+              <SelectItem value="GYM">🏋️ Gym / Fitness</SelectItem>
+              <SelectItem value="HEALTHCARE">🏥 Healthcare / Clinic</SelectItem>
+              <SelectItem value="PHARMACY">💊 Pharmacy</SelectItem>
+              <SelectItem value="DENTIST">🦷 Dentist</SelectItem>
+              <SelectItem value="SERVICE">🤝 Professional Service</SelectItem>
+              <SelectItem value="AUTOMOTIVE">🚗 Automotive / Garage</SelectItem>
+              <SelectItem value="PET">🐾 Pet Store / Vet</SelectItem>
+              <SelectItem value="TECH">💻 Tech / Electronics</SelectItem>
+              <SelectItem value="TRAVEL">✈️ Travel / Agency</SelectItem>
+              <SelectItem value="SCHOOL">🏫 Education / School</SelectItem>
+              <SelectItem value="BANK">🏦 Bank / Finance</SelectItem>
+              <SelectItem value="OTHER">🏪 Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
