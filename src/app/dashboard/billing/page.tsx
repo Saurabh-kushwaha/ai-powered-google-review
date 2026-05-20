@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
   CheckCircle2, XCircle, Clock, CreditCard,
-  Loader2, RefreshCw, Receipt, AlertTriangle,
+  Loader2, RefreshCw, Receipt, AlertTriangle, Download,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -255,6 +255,7 @@ export default function BillingPage() {
                         <th className="pb-3 font-medium">Amount</th>
                         <th className="pb-3 font-medium">Status</th>
                         <th className="pb-3 font-medium">Payment ID</th>
+                        <th className="pb-3 font-medium">Invoice</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -276,6 +277,18 @@ export default function BillingPage() {
                           </td>
                           <td className="py-3 text-zinc-400 font-mono text-xs truncate max-w-[120px]">
                             {p.razorpayPaymentId ?? "—"}
+                          </td>
+                          <td className="py-3">
+                            {p.status === "SUCCESS" && (
+                              <a
+                                href={`/api/billing/invoice/${p.id}`}
+                                download
+                                className="inline-flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                PDF
+                              </a>
+                            )}
                           </td>
                         </tr>
                       ))}

@@ -11,64 +11,71 @@ const AMOUNTS = {
 };
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json() as { type: "ONBOARDING" | "RENEWAL" };
+  const { type } = body;
+
+  if (!["ONBOARDING", "RENEWAL"].includes(type)) {
+    return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+  }
+
+  // Check Razorpay keys are configured
+  const keyId = process.env.RAZORPAY_KEY_ID ?? "";
+  const keySecret = process.env.RAZORPAY_KEY_SECRET ?? "";
+
+  if (!keyId || keyId.includes("XXXX") || !keySecret || keySecret.includes("XXXX")) {
+    return NextResponse.json(
+      { error: "Payment gateway not configured", step: "env_check", keyIdSet: !!keyId },
+      { status: 503 }
+    );
+  }
+
+  // Step 1: Create Razorpay order
+  let orderId: string;
+  let amount: number;
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { type } = await request.json() as { type: "ONBOARDING" | "RENEWAL" };
-
-    if (!["ONBOARDING", "RENEWAL"].includes(type)) {
-      return NextResponse.json({ error: "Invalid type" }, { status: 400 });
-    }
-
-    // Check Razorpay keys are configured
-    if (!process.env.RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID.includes("XXXX")) {
-      console.error("CREATE_ORDER_ERROR: Razorpay keys not configured in .env");
-      return NextResponse.json(
-        { error: "Payment gateway not configured. Add your Razorpay keys to .env" },
-        { status: 503 }
-      );
-    }
-
-    const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID!,
-      key_secret: process.env.RAZORPAY_KEY_SECRET!,
-    });
-
-    const amount = AMOUNTS[type];
-
+    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    amount = AMOUNTS[type];
+    const receipt = `r_${session.user.id.slice(-8)}_${Date.now()}`.slice(0, 40);
     const order = await razorpay.orders.create({
       amount,
       currency: "INR",
-      receipt: `rcpt_${session.user.id}_${Date.now()}`,
+      receipt,
       notes: { userId: session.user.id, type },
     });
+    orderId = order.id;
+  } catch (err: unknown) {
+    const detail = err instanceof Error ? err.message : JSON.stringify(err);
+    console.error("CREATE_ORDER_RAZORPAY_ERROR:", detail);
+    return NextResponse.json(
+      { error: "Razorpay order creation failed", step: "razorpay", detail },
+      { status: 500 }
+    );
+  }
 
-    // Persist a PENDING payment record (requires `npx prisma generate` to have been run)
+  // Step 2: Persist to DB
+  try {
     await prisma.payment.create({
       data: {
         userId: session.user.id,
-        razorpayOrderId: order.id,
+        razorpayOrderId: orderId,
         amount,
         type,
         status: "PENDING",
       },
     });
-
-    return NextResponse.json({ orderId: order.id, amount, currency: "INR" });
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error("CREATE_ORDER_ERROR:", msg);
-
-    if (msg.toLowerCase().includes("payment") || msg.toLowerCase().includes("unknown field")) {
-      return NextResponse.json(
-        { error: "Database schema is outdated. Stop the server, run `npx prisma generate`, then restart." },
-        { status: 503 }
-      );
-    }
-
-    return NextResponse.json({ error: "Failed to create order", detail: msg }, { status: 500 });
+  } catch (err: unknown) {
+    const detail = err instanceof Error ? err.message : JSON.stringify(err);
+    console.error("CREATE_ORDER_DB_ERROR:", detail);
+    return NextResponse.json(
+      { error: "Database error — run `npx prisma generate` and redeploy", step: "prisma", detail },
+      { status: 503 }
+    );
   }
+
+  return NextResponse.json({ orderId, amount, currency: "INR" });
 }
