@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -67,14 +67,15 @@ export default function BillingPage() {
   const [fetching, setFetching] = useState(true);
   const [renewLoading, setRenewLoading] = useState(false);
 
-  const fetchBilling = async () => {
+  const fetchBilling = useCallback(async () => {
     setFetching(true);
     const res = await fetch("/api/billing");
     if (res.ok) setData(await res.json());
     setFetching(false);
-  };
+  }, []);
 
-  useEffect(() => { fetchBilling(); }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchBilling(); }, [fetchBilling]);
 
   const loadRazorpayScript = (): Promise<boolean> =>
     new Promise((resolve) => {

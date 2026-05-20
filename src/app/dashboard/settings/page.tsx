@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { toast } from "sonner";
 import {
@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 // ─── Section header ──────────────────────────────────────────────────────────
 function SectionHeader({ icon: Icon, title, description }: {
@@ -42,10 +42,16 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 export default function SettingsPage() {
   const { data: session } = useSession();
 
-  // Profile state
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  // Profile state — initialized from session; updates when session loads
+  const [name, setName] = useState(session?.user?.name ?? "");
+  const [email, setEmail] = useState(session?.user?.email ?? "");
   const [profileLoading, setProfileLoading] = useState(false);
+
+  // Keep in sync if session loads after first render
+  const sessionName = session?.user?.name ?? "";
+  const sessionEmail = session?.user?.email ?? "";
+  if (name === "" && sessionName) setName(sessionName);
+  if (email === "" && sessionEmail) setEmail(sessionEmail);
 
   // Password state
   const [currentPassword, setCurrentPassword] = useState("");
@@ -57,13 +63,6 @@ export default function SettingsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // Load current user info
-  useEffect(() => {
-    if (session?.user) {
-      setName(session.user.name ?? "");
-      setEmail(session.user.email ?? "");
-    }
-  }, [session]);
 
   // ── Save profile ────────────────────────────────────────────────────────────
   const handleProfileSave = async (e: React.FormEvent) => {
