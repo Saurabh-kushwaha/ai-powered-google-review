@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { pdf } from "@react-pdf/renderer";
+import { pdf, DocumentProps } from "@react-pdf/renderer";
 import { InvoicePDF } from "@/components/billing/InvoicePDF";
-import React from "react";
+import React, { JSXElementConstructor, ReactElement } from "react";
 
 export async function GET(
   _req: Request,
@@ -35,26 +35,27 @@ export async function GET(
     payment.createdAt.getMonth() + 1
   ).padStart(2, "0")}-${payment.id.slice(-6).toUpperCase()}`;
 
-  // @react-pdf/renderer v4 — use pdf().toBuffer()
-  const buffer = await pdf(
-    React.createElement(InvoicePDF, {
-      invoiceNumber,
-      payment: {
-        id: payment.id,
-        razorpayPaymentId: payment.razorpayPaymentId ?? "—",
-        amount: payment.amount,
-        type: payment.type,
-        status: payment.status,
-        createdAt: payment.createdAt.toISOString(),
-      },
-      user: {
-        name: user?.name ?? "Customer",
-        email: user?.email ?? "",
-      },
-    })
-  ).toBuffer();
+  // @react-pdf/renderer v4 — toBuffer() returns a ReadableStream; use toBlob() instead
+  const element = React.createElement(InvoicePDF, {
+    invoiceNumber,
+    payment: {
+      id: payment.id,
+      razorpayPaymentId: payment.razorpayPaymentId ?? "—",
+      amount: payment.amount,
+      type: payment.type,
+      status: payment.status,
+      createdAt: payment.createdAt.toISOString(),
+    },
+    user: {
+      name: user?.name ?? "Customer",
+      email: user?.email ?? "",
+    },
+  }) as ReactElement<DocumentProps, string | JSXElementConstructor<unknown>>;
 
-  return new NextResponse(buffer, {
+  const blob = await pdf(element).toBlob();
+  const arrayBuffer = await blob.arrayBuffer();
+
+  return new NextResponse(arrayBuffer, {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
