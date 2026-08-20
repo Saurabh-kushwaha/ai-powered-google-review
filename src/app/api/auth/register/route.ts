@@ -3,7 +3,7 @@ import { NextResponse as Response } from "next/server";
 import bcrypt from "bcrypt";
 import prisma from "@/lib/prisma";
 
-// addding comments
+
 
 export async function POST(request: Request) {
   try {
